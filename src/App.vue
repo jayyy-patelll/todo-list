@@ -3,25 +3,24 @@
   import Dialogue from "./components/Dialogue.vue";
   import StatusBar from "./components/StatusBar.vue";
 
-  import { reactive, onMounted, computed, watch, watchEffect } from "vue";
-  import type {Task} from "./types/Task.ts";
+  import { reactive, onMounted, watch } from "vue";
+  import {Task} from "./types/Task.ts";
 
   let tasks = reactive<Task[]>(JSON.parse(localStorage.getItem("tasks")!) || []);
-
-  
-  watch(tasks, ()=>{ 
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  })
-  // watch( state, () => {} );
-
-  const deleteAllTasks = () => { 
-    tasks.splice(0,tasks.length); 
-    localStorage.removeItem("tasks"); 
-  };
 
   function changeTasks(newTasks: Task[]){
     tasks = newTasks
   }
+
+  const deleteAllTasks = () => { 
+    tasks = tasks.splice(0,tasks.length); 
+    localStorage.removeItem("tasks"); 
+  };
+
+  watch(tasks, ()=>{ 
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  })
+  // watch( state, () => {} );
 
   onMounted(() => { 
     if (localStorage.getItem("tasks")) { 
@@ -37,16 +36,18 @@
         <h1 class="text-center">To-Do List</h1> &nbsp;
         <StatusBar :tasks="tasks" />
         &nbsp;
-
-        <!-- Dynamically assign the value of a variable -->
+        
         <Card :tasks="tasks" @changeTasks="changeTasks($event)" />
-        <Dialogue :tasks="tasks" />
+        &nbsp;
 
-
-        <button type="button" @click="deleteAllTasks()"> 
-          <v-sheet class="pa-1 ma-1" color="red"> Clear All </v-sheet>
-        </button>
-
+        <div style="display: flex; justify-content: center;">
+          <Dialogue :tasks="tasks" />
+          <button type="button" @click="deleteAllTasks()"> 
+            <v-sheet class="pa-1 ma-1" color="red"> Clear All </v-sheet>
+          </button>
+        </div>
+        &nbsp;
+        
       </div> 
     </div> 
   </div> 

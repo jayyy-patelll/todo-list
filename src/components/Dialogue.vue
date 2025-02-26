@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import type { PropType } from "vue";
     import { ref, watch, watchEffect } from "vue";
-    import type {Task} from "../types/Task.ts";
+    import {Task} from "../types/Task.ts";
 
     const props = defineProps({
         tasks: {
@@ -15,47 +15,33 @@
     const dialog = ref(false);
     const newTaskTitle = ref("");
     const newTaskDescription = ref("");
-    const newTaskPriority = ref("");
+    const newTaskPriority = ref();
     const newTaskDateOfCompletion = ref("");
 
     const addTask = () => { 
         if (!newTaskTitle.value || !newTaskDescription.value) return;
 
-        const newTask: Task = {
-            id: Math.round(Math.random() * 100),
-            title: newTaskTitle.value,
-            description: newTaskDescription.value,
-            isDone: false,
-            priority: newTaskPriority.value as "High" | "Medium" | "Low" | "None",
-            dateOfCompletion: newTaskDateOfCompletion.value,
-        };
+        const newTask = new Task(newTaskTitle.value, newTaskDescription.value, false, newTaskPriority.value, newTaskDateOfCompletion.value);
         props.tasks.push(newTask);
         emit('changeTasks', props.tasks);
-        localStorage.setItem("tasks", JSON.stringify(props.tasks));
+
         newTaskTitle.value = "";
         newTaskDescription.value = "";
         newTaskPriority.value = "";
         newTaskDateOfCompletion.value = "";
     }; 
-
-    watch(props.tasks, () => {
-        localStorage.setItem("tasks", JSON.stringify(props.tasks));
-    })
 </script>
 
 <template>
     <v-dialog v-model="dialog" max-width="600">
         <template v-slot:activator="{ props: activatorProps }">
         <v-btn
-            class="text-none font-weight-regular"
-            prepend-icon="mdi-account"
             text="Add Task"
             variant="tonal"
             color="green"
             v-bind="activatorProps"
-            style="margin-left: 10px;"
         >
-            <span style="margin: auto;">+</span>
+            <span style="margin: auto;">Add Task</span>
             <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=add_task" />
             <span class="material-symbols-outlined">add_task</span> -->
         </v-btn>
@@ -83,6 +69,7 @@
                 ></v-autocomplete>
             </v-col>
             <v-col cols="" md="4" sm="6">
+                <!-- <v-date-input clearable label="Date input" v-model="newTaskDateOfCompletion"></v-date-input> -->
                 <v-text-field
                 v-model="newTaskDateOfCompletion"
                 hint="Format: YYYY-MM-DD"
